@@ -1,36 +1,37 @@
 from StockMarketService import StockMarketService
 from TwitterService import TwitterService
-import matplotlib.pyplot as plt
-from datetime import datetime
+from DrawingService import DrawingService
+from datetime import datetime, timedelta
 
-
-def on_plot_hover(event):
-    for curve in plot.get_lines():
-        contains, data = curve.contains(event)
-        if contains:
-            if curve.get_gid() == "tweets":
-                annot.set_visible(True)
-                tweet_id = data["ind"][0]
-                annot.set_text(tweets[tweet_id][1])
-                annot.set_position((tweets[tweet_id][0], 400))
-                print(tweets[tweet_id][1])
-            else:
-                annot.set_visible(False)
-    fig.canvas.draw()
-  
-
-
-fig, plot = plt.subplots()
 sms = StockMarketService("TSLA")
-prices = sms.get(10)
+prices = sms.get(5)
 ts = TwitterService("elonmusk")
-tweets = ts.get_tweets(10)
-plot.plot(list(map(lambda x: x[0], prices)), list(map(lambda x: x[1], prices)))
-plot.plot(list(map(lambda x: x[0], tweets)), [
-          400]*len(tweets), "o", color="pink", gid="tweets")
-annot = plt.annotate("", xy=(datetime.today(), 400))
-annot.set_visible(False)
+tweets = ts.get_tweets(5)
 
-fig.canvas.mpl_connect('motion_notify_event', on_plot_hover)
-plt.xticks(rotation=45)
-plt.show()
+priced_tweets=[]
+
+def reverse_interpolate_date(val: datetime, start: datetime, end: datetime):
+    start_end_delta=(end-start).total_seconds()
+    start_val_delta=(val-start).total_seconds()
+    delta=start_val_delta/start_end_delta
+    return delta 
+
+def interpolate(delta: float, start: float, end: float):
+    return start+(end-start)*delta
+
+for tweet in tweets:
+    if tweet[0]<prices[0][0] or tweet[0]>prices[-1][0]:
+        continue
+    for i in range(0, len(prices)):
+        if tweet[0]>prices[i][0] and tweet[0]<prices[i+1][0]:
+            dates_delta=reverse_interpolate_date(tweet[0], prices[i][0], prices[i+1][0])
+            price=interpolate(dates_delta, prices[i][1], prices[i+1][1])
+            priced_tweets.append((tweet[0], tweet[1], price, tweet[2]))
+            break
+
+ds=DrawingService(priced_tweets, prices)
+ds.draw()
+    
+
+reverse_interpolate_date(datetime.today(), datetime.today()-timedelta(days=1), datetime.today()+timedelta(days=3))
+

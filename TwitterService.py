@@ -13,4 +13,4 @@ class TwitterService():
         end_date = datetime.today().strftime("%Y-%m-%d")
         tweets_criteria = got.manager.TweetCriteria().setUsername(self.user_name).setSince(start_date).setUntil(end_date)
         tweets = got.manager.TweetManager.getTweets(tweets_criteria)
-        return list(map(lambda x: (x.date, x.text), tweets))
+        return list(map(lambda x: (datetime.strptime(x.date.strftime("%Y-%m-%d"), "%Y-%m-%d"), x.text, x.permalink), tweets))
