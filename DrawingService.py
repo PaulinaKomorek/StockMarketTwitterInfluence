@@ -14,8 +14,9 @@ class DrawingService():
         self.tweets=tweets
         self.prices=prices
         self.fig, self.plot = plt.subplots()
-        self.annot = plt.text(tweets[0][0]-timedelta(days=1), 400, "", backgroundcolor="white", wrap=True)
-        self.annot.set_visible(False)
+        if len(tweets)>0:
+            self.annot = plt.text(tweets[0][0]-timedelta(days=1), 400, "", backgroundcolor="white", wrap=True)
+            self.annot.set_visible(False)
         self.fig.canvas.mpl_connect('motion_notify_event', self.on_plot_hover)
         self.fig.canvas.mpl_connect('button_press_event', self.on_plot_click)
         plt.xticks(rotation=45)

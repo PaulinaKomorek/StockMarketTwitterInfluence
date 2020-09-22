@@ -13,6 +13,15 @@ class StockMarketService():
         self.index_name = index_name
         self.company_data = YahooFinancials(index_name)
 
+
+    def validate(self):
+        try:
+            self.get(1)
+            return True
+        except:
+            return False
+                
+
     def get(self, days: int):
         start_date = (datetime.today() - timedelta(days=days)).strftime("%Y-%m-%d")
         end_date = datetime.today().strftime("%Y-%m-%d")

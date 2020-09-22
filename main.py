@@ -3,10 +3,22 @@ from TwitterService import TwitterService
 from DrawingService import DrawingService
 from datetime import datetime, timedelta
 
-sms = StockMarketService("TSLA")
-prices = sms.get(5)
-ts = TwitterService("elonmusk")
-tweets = ts.get_tweets(5)
+company_name=input("Enter company name ")
+sms = StockMarketService(company_name)
+while not sms.validate():
+    company_name=input("Invalid company name. Try again.")
+    sms = StockMarketService(company_name)
+#twitter_user_name=input("Enter Twitter user name ")
+days=input("Enter number of days ")
+while not days.isdigit():
+    days=input("The number of days should be represented by positive intiger, try again.")
+days=int(days)
+
+
+prices = sms.get(days)
+#ts = TwitterService(twitter_user_name)
+tweets=[]
+#tweets = ts.get_tweets(days)
 
 priced_tweets=[]
 
