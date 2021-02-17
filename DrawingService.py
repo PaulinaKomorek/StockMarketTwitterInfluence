@@ -28,8 +28,9 @@ class DrawingService():
             contains, data = curve.contains(event)
             if contains and curve.get_gid() == "tweets":
                 self.annot.set_visible(True)
-                tweet_id = data["ind"][0]
-                self.annot.set_text(self.tweets[tweet_id][1])
+                tweet_ids = data["ind"]
+                tweets = list(map(lambda i: self.tweets[i][1], tweet_ids))
+                self.annot.set_text("\n\n".join(tweets))
                 self.annot.set_position((x, y))
             else:
                 self.annot.set_visible(False)

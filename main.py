@@ -2,24 +2,15 @@ from StockMarketService import StockMarketService
 from TwitterService import TwitterService
 from DrawingService import DrawingService
 from datetime import datetime, timedelta
+from InputBox import InputBox
 
-company_name=input("Enter company name ")
+ib = InputBox()
+company_name, user_name, days = ib.get_data()
 sms = StockMarketService(company_name)
-while not sms.validate():
-    company_name=input("Invalid company name. Try again.")
-    sms = StockMarketService(company_name)
-#twitter_user_name=input("Enter Twitter user name ")
-days=input("Enter number of days ")
-while not days.isdigit():
-    days=input("The number of days should be represented by positive intiger, try again.")
-days=int(days)
-
-
 prices = sms.get(days)
-#ts = TwitterService(twitter_user_name)
+ts = TwitterService(user_name)
 tweets=[]
-#tweets = ts.get_tweets(days)
-
+tweets = ts.get_tweets(days)
 priced_tweets=[]
 
 def reverse_interpolate_date(val: datetime, start: datetime, end: datetime):
@@ -45,5 +36,4 @@ ds=DrawingService(priced_tweets, prices)
 ds.draw()
     
 
-reverse_interpolate_date(datetime.today(), datetime.today()-timedelta(days=1), datetime.today()+timedelta(days=3))
 
