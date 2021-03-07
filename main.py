@@ -3,37 +3,33 @@ from TwitterService import TwitterService
 from DrawingService import DrawingService
 from datetime import datetime, timedelta
 from InputBox import InputBox
-
-ib = InputBox()
-company_name, user_name, days = ib.get_data()
-sms = StockMarketService(company_name)
-prices = sms.get(days)
-ts = TwitterService(user_name)
-tweets=[]
-tweets = ts.get_tweets(days)
-priced_tweets=[]
-
-def reverse_interpolate_date(val: datetime, start: datetime, end: datetime):
-    start_end_delta=(end-start).total_seconds()
-    start_val_delta=(val-start).total_seconds()
-    delta=start_val_delta/start_end_delta
-    return delta 
-
-def interpolate(delta: float, start: float, end: float):
-    return start+(end-start)*delta
-
-for tweet in tweets:
-    if tweet[0]<prices[0][0] or tweet[0]>prices[-1][0]:
-        continue
-    for i in range(0, len(prices)):
-        if tweet[0]>prices[i][0] and tweet[0]<prices[i+1][0]:
-            dates_delta=reverse_interpolate_date(tweet[0], prices[i][0], prices[i+1][0])
-            price=interpolate(dates_delta, prices[i][1], prices[i+1][1])
-            priced_tweets.append((tweet[0], tweet[1], price, tweet[2]))
-            break
-
-ds=DrawingService(priced_tweets, prices)
-ds.draw()
-    
+from utilities.set_tweets_prices import set_tweets_prices
 
 
+def main():
+    ib = InputBox()
+    form = ib.get_data()
+    sms = StockMarketService(form.company)
+    while not sms.validate():
+        ib = InputBox()
+        form = ib.get_data()
+        sms.index_name = form.company
+    prices = sms.get(form.days)
+    ts = TwitterService(form.user)
+    while not ts.validate():
+        ib = InputBox()
+        form = ib.get_data()
+        ts.user_name = form.user
+    tweets = []
+    tweets = ts.get_tweets(form.days)
+    set_tweets_prices(tweets, prices)
+    tweets = list(filter(lambda x: hasattr(x, "price"), tweets))
+    ds = DrawingService(tweets, prices)
+    ds.draw()
+
+
+if __name__ == "__main__":
+    main()
+
+
+# znaleźć, jak się robi "słupki"-błąd
