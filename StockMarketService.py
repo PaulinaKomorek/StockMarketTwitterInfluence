@@ -6,21 +6,20 @@ from models.Price import Price
 
 class StockMarketService():
     index_name: str
-
-
-    def __init__(self, index_name: str):
-        self.index_name = index_name
+    days: int
+    
 
     def validate(self):
         try:
-            self.get(1)
+            self.days = 1
+            self.get()
             return True
         except:
             return False
                 
 
-    def get(self, days: int):
-        start_date = (datetime.today() - timedelta(days=days)).strftime("%Y-%m-%d")
+    def get(self):
+        start_date = (datetime.today() - timedelta(days=self.days)).strftime("%Y-%m-%d")
         end_date = datetime.today().strftime("%Y-%m-%d")
         company_data = YahooFinancials(self.index_name)
         market_data = company_data.get_historical_price_data(start_date, end_date, 'daily')
