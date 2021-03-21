@@ -10,6 +10,6 @@ def set_tweets_prices(tweets: list, prices: list):
                 dates_delta = reverse_interpolate_date(
                     tweet.time, prices[i].time, prices[i+1].time)
                 price = interpolate(
-                    dates_delta, prices[i].low, prices[i+1].low)
+                    dates_delta, (prices[i].low + prices[i].high)/2, (prices[i+1].low + prices[i+1].high)/2)
                 tweet.price = price
                 break

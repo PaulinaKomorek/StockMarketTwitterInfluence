@@ -48,8 +48,10 @@ class DrawingService():
                 webbrowser.open(link, new=2)
 
     def draw(self):
-        self.plot.plot(list(map(lambda x: x.time, self.prices)),
-                       list(map(lambda x: x.low, self.prices)))
+        plt.errorbar(list(map(lambda x: x.time, self.prices)),
+                        list(map(lambda x: (x.low + x.high)/2, self.prices)),
+                        yerr = [list(map(lambda x: abs((x.low + x.high)/2 -x.low), self.prices)), list(map(lambda x: abs((x.low + x.high)/2 -x.high), self.prices))])
         self.plot.plot(list(map(lambda x: x.time, self.tweets)), list(
             map(lambda x: x.price, self.tweets)), "o", color="pink", gid="tweets")
+
         plt.show()
